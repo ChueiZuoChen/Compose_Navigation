@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun ScreenB(onNavigation:()->Unit) {
+fun ScreenB(string: String?,onNavigation:()->Unit) {
     Surface(
         color = Color.Blue,
         modifier = Modifier.fillMaxSize()
@@ -21,7 +21,7 @@ fun ScreenB(onNavigation:()->Unit) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "This is Screen B")
+            Text(text = "This is Screen B $string")
             Button(
                 onClick = { onNavigation() },
                 modifier = Modifier.align(Alignment.BottomCenter)

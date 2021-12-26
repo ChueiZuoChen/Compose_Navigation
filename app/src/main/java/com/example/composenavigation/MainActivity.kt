@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.composenavigation.screens.ScreenA
 import com.example.composenavigation.screens.ScreenB
@@ -37,14 +38,52 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    MyNavHost(navHostController = navController)
+                    //MyNavHost(navHostController = navController)
+                    MyNavHost2(navHostController = navController)
                 }
             }
         }
     }
 }
 
-/**[1]
+/**傳遞參數*/
+@Composable
+fun MyNavHost2(navHostController: NavHostController) {
+    /**因為Ｂ的接收有帶參數所以要重新建立標籤, “/” 後面是Key，他會創建一個Key名為myArg的bundle提供B去取得上一個頁面傳來的資料*/
+    val routeWithArgument = "${NavRoute.SCREEN_B}/{myArg}"
+
+    NavHost(navController = navHostController, startDestination = NavRoute.SCREEN_A) {
+        composable(NavRoute.SCREEN_A) {
+            ScreenA {
+                /**造一個value值*/
+                val myString = "YoPotti"
+                /**將它傳給ScreenB然後斜線後面是帶的內容*/
+                navHostController.navigate("${NavRoute.SCREEN_B}/$myString")
+            }
+        }
+        /**composable他有arguments參數是一個List*/
+        composable(
+            routeWithArgument,
+            arguments = listOf(navArgument(name = "myArg") {})
+        ) { navEntry -> /** navEntry是ScreenB的堆疊物件他裡面包含了所有資訊*/
+            ScreenB(navEntry.arguments?.getString("myArg")) {
+                navHostController.navigate(NavRoute.SCREEN_C)
+            }
+        }
+        composable(NavRoute.SCREEN_C) {
+            ScreenC {
+                navHostController.navigate(NavRoute.SCREEN_A) {
+                    popUpTo(NavRoute.SCREEN_A) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/**[1] 基本跳轉頁面
  * 創建navigation host 他需要三個參數
  * 1. navigation controller(控制畫面的跳轉動作)
  * 2. 再host的起始頁面,在上面我們定義了頁面的標籤,初始頁面設置ScreenA
@@ -57,7 +96,10 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun MyNavHost(navHostController: NavHostController) {
-    NavHost(navController = navHostController, startDestination = NavRoute.SCREEN_A) {
+    NavHost(
+        navController = navHostController,
+        startDestination = NavRoute.SCREEN_A
+    ) {
         /**composable是把標籤跟 composable view關聯在一起*/
         composable(NavRoute.SCREEN_A) {
             ScreenA {
@@ -66,9 +108,9 @@ fun MyNavHost(navHostController: NavHostController) {
             }
         }
         composable(NavRoute.SCREEN_B) {
-            ScreenB {
+           /* ScreenB {
                 navHostController.navigate(NavRoute.SCREEN_C)
-            }
+            }*/
         }
         composable(NavRoute.SCREEN_C) {
             ScreenC {
