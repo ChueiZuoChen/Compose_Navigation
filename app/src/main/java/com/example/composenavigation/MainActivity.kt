@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
 fun MyNavHost2(navHostController: NavHostController) {
     /**因為Ｂ的接收有帶參數所以要重新建立標籤, “/” 後面是Key，他會創建一個Key名為myArg的bundle提供B去取得上一個頁面傳來的資料*/
     val routeWithArgument = "${NavRoute.SCREEN_B}/{myArg}"
-
+    val routeWithArgumentC = "${NavRoute.SCREEN_C}/{visible}"
     NavHost(navController = navHostController, startDestination = NavRoute.SCREEN_A) {
         composable(NavRoute.SCREEN_A) {
             ScreenA {
@@ -65,13 +66,22 @@ fun MyNavHost2(navHostController: NavHostController) {
         composable(
             routeWithArgument,
             arguments = listOf(navArgument(name = "myArg") {})
-        ) { navEntry -> /** navEntry是ScreenB的堆疊物件他裡面包含了所有資訊*/
+        ) { navEntry ->
+            /** navEntry是ScreenB的堆疊物件他裡面包含了所有資訊*/
             ScreenB(navEntry.arguments?.getString("myArg")) {
-                navHostController.navigate(NavRoute.SCREEN_C)
+                /**傳一個Boolean值給ScreenC*/
+                val myBoolean = true
+                navHostController.navigate("${NavRoute.SCREEN_C}/$myBoolean")
             }
         }
-        composable(NavRoute.SCREEN_C) {
-            ScreenC {
+        /**接收布林值得時候要注意如果是Null就必須設預設值，在arguments參數，必須使用NavType.BoolType去轉換型態給C接收*/
+        composable(
+            routeWithArgumentC,
+            arguments = listOf(navArgument(name = "visible") {
+                type = NavType.BoolType
+            })
+        ) {
+            ScreenC(it.arguments?.getBoolean("visible", false)) {
                 navHostController.navigate(NavRoute.SCREEN_A) {
                     popUpTo(NavRoute.SCREEN_A) {
                         inclusive = true
@@ -108,23 +118,24 @@ fun MyNavHost(navHostController: NavHostController) {
             }
         }
         composable(NavRoute.SCREEN_B) {
-           /* ScreenB {
-                navHostController.navigate(NavRoute.SCREEN_C)
-            }*/
+            /* ScreenB {
+                 navHostController.navigate(NavRoute.SCREEN_C)
+             }*/
         }
         composable(NavRoute.SCREEN_C) {
-            ScreenC {
+            /*ScreenC {
                 navHostController.navigate(NavRoute.SCREEN_A) {
                     popUpTo(NavRoute.SCREEN_A) { inclusive = true }
-                    /** 一般情況下 A>B>C>A>B>C 他堆疊會一直累加 當返回會變成 C>B>A>C>B>A>跳出程式
-                     * 使用popUpTo() : A>B>C>A>B>C 當返回會變成 C>B>A>跳出程式
-                     * 他會pop堆疊直到A的出現就跳出程式.
-                     * popUpTo()底下的inclusive 式表示堆疊pop當到A時需要連同A一起pop嗎？
-                     * true : 到Ａ畫面時按返回會跳出程式
-                     * false : 到A畫面時按下第一次返回 不會有動作因為最後的堆疊A被清掉 然後再按第二次返回時，程式知道堆疊已經沒有東西了，所以跳出程式
-                     * */
+                    */
+            /** 一般情況下 A>B>C>A>B>C 他堆疊會一直累加 當返回會變成 C>B>A>C>B>A>跳出程式
+             * 使用popUpTo() : A>B>C>A>B>C 當返回會變成 C>B>A>跳出程式
+             * 他會pop堆疊直到A的出現就跳出程式.
+             * popUpTo()底下的inclusive 式表示堆疊pop當到A時需要連同A一起pop嗎？
+             * true : 到Ａ畫面時按返回會跳出程式
+             * false : 到A畫面時按下第一次返回 不會有動作因為最後的堆疊A被清掉 然後再按第二次返回時，程式知道堆疊已經沒有東西了，所以跳出程式
+             * *//*
                 }
-            }
+            }*/
         }
     }
 }

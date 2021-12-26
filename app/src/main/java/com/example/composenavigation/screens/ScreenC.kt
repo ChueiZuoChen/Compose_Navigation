@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun ScreenC(onNavigation: () -> Unit) {
+fun ScreenC(visible: Boolean?, onNavigation: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.Yellow
@@ -20,7 +20,11 @@ fun ScreenC(onNavigation: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "This is Screen C")
+            if (visible!!){
+                Text(text = "Receive argument = $visible")
+            }else {
+                Text(text = "Receive argument = $visible")
+            }
             Button(
                 onClick = { onNavigation() },
                 modifier = Modifier.align(Alignment.BottomCenter)
